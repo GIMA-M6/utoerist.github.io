@@ -1,79 +1,134 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utrecht Tourist Route Planner</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #map { height: 100vh; width: 100vw; z-index: 1; }
-        
-        /* Het zwevende UI Paneel */
-        #ui-panel {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            width: 300px;
-            z-index: 1000; /* Zorgt dat het paneel BOVEN de kaart zweeft */
+// 1. Initialiseer de kaart gecentreerd op Utrecht
+const map = L.map('map').setView([52.0907, 5.1214], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// 2. Variabelen om data op te slaan
+let startCoords = null;
+let endCoords = null;
+let routeLine = null;
+let markers = [];
+
+// --- FUNCTIE: Geocoding via OpenStreetMap (Nominatim) ---
+async function geocodeLocation(query, isStart) {
+    const statusText = document.getElementById('status-text');
+    statusText.innerText = "Searching for location...";
+
+    // Voeg ', Utrecht' toe zodat zoeken buiten de stad wordt voorkomen
+    const searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Utrecht')}&limit=1`;
+
+    try {
+        const response = await fetch(searchUrl);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            const placeName = data[0].display_name.split(',')[0]; // Korte naam
+
+            const coords = { lat: lat, lng: lng };
+            
+            if (isStart) {
+                startCoords = coords;
+                document.getElementById('start-input').value = placeName;
+            } else {
+                endCoords = coords;
+                document.getElementById('end-input').value = placeName;
+            }
+
+            // Plaats pin en zoom
+            const marker = L.marker([lat, lng]).addTo(map);
+            markers.push(marker);
+            map.setView([lat, lng], 15);
+            
+            statusText.innerText = "Location found!";
+        } else {
+            statusText.innerText = "Location not found in Utrecht.";
         }
+    } catch (error) {
+        console.error("Geocoding Error:", error);
+        statusText.innerText = "Search failed.";
+    }
+}
 
-        #ui-panel h2 { margin-top: 0; font-size: 1.4rem; color: #333; }
-        
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .input-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;}
-        
-        /* Knoppen opmaak */
-        .btn { padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-full { width: 100%; margin-bottom: 10px; }
-        
-        #calc-btn { background-color: #0078A8; color: white; }
-        #calc-btn:hover { background-color: #005f85; }
-        
-        #reset-btn { background-color: #e0e0e0; color: #333; }
-        #reset-btn:hover { background-color: #ccc; }
-        
-        .search-btn { width: 40px; margin: 0; padding: 8px; background-color: #0078A8; color: white; }
-        .search-btn:hover { background-color: #005f85; }
-    </style>
-</head>
-<body>
+// --- EVENT LISTENERS: Klikken op de kaart ---
+map.on('click', function(e) {
+    if (!startCoords) {
+        startCoords = e.latlng;
+        document.getElementById('start-input').value = `Lat: ${e.latlng.lat.toFixed(4)}, Lon: ${e.latlng.lng.toFixed(4)}`;
+        markers.push(L.marker(e.latlng).addTo(map));
+    } else if (!endCoords) {
+        endCoords = e.latlng;
+        document.getElementById('end-input').value = `Lat: ${e.latlng.lat.toFixed(4)}, Lon: ${e.latlng.lng.toFixed(4)}`;
+        markers.push(L.marker(e.latlng).addTo(map));
+    }
+});
 
-    <div id="ui-panel">
-        <h2>Utrecht Tourist Route Planner</h2>
-        
-        <div class="input-group">
-            <label>Origin</label>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="start-input" placeholder="Type a place or click map...">
-                <button id="search-start" class="btn search-btn">🔍</button>
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label>Destination</label>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="end-input" placeholder="Type a place or click map...">
-                <button id="search-end" class="btn search-btn">🔍</button>
-            </div>
-        </div>
+// --- EVENT LISTENERS: Zoekbalken ---
+document.getElementById('search-start').addEventListener('click', function() {
+    const query = document.getElementById('start-input').value;
+    if (query.length > 2) geocodeLocation(query, true);
+});
 
-        <button id="calc-btn" class="btn btn-full">Calculate Route</button>
-        <button id="reset-btn" class="btn btn-full">Reset Map</button>
+document.getElementById('search-end').addEventListener('click', function() {
+    const query = document.getElementById('end-input').value;
+    if (query.length > 2) geocodeLocation(query, false);
+});
+
+// Zorg dat 'Enter' ook werkt in de zoekbalken
+document.getElementById('start-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('search-start').click();
+});
+document.getElementById('end-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('search-end').click();
+});
+
+// --- EVENT LISTENER: Route Berekenen (API Aanroep) ---
+document.getElementById('calc-btn').addEventListener('click', async function() {
+    if (!startCoords || !endCoords) {
+        alert("Please select both an Origin and a Destination first!");
+        return;
+    }
+
+    const statusText = document.getElementById('status-text');
+    statusText.innerText = "Calculating route... (waking up server if asleep, max 60s)";
+
+    // Link naar jullie live Render Python API
+    const apiUrl = `https://route-backend-api.onrender.com/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Server error or sleep timeout");
         
-        <p id="status-text" style="font-size: 0.8rem; color: #888; text-align: center; margin-bottom: 0;"></p>
-    </div>
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            if (routeLine) map.removeLayer(routeLine);
+            
+            // Teken de rode lijn
+            routeLine = L.polyline(data.route, {color: '#e32400', weight: 6, opacity: 0.8}).addTo(map);
+            map.fitBounds(routeLine.getBounds());
+            statusText.innerText = "Route found!";
+        } else {
+            statusText.innerText = "Could not find a route.";
+        }
+    } catch (error) {
+        console.error("API Error:", error);
+        statusText.innerText = "Error connecting to server. Please try again.";
+    }
+});
 
-    <div id="map"></div>
-
-    <script src="app.js"></script>
-</body>
-</html>
+// --- EVENT LISTENER: Reset de kaart ---
+document.getElementById('reset-btn').addEventListener('click', function() {
+    startCoords = null;
+    endCoords = null;
+    
+    document.getElementById('start-input').value = "";
+    document.getElementById('end-input').value = "";
+    document.getElementById('status-text').innerText = "";
+    
+    if (routeLine) map.removeLayer(routeLine);
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+});
