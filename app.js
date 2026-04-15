@@ -16,7 +16,7 @@ map.on('click', async function(e) {
         const end = clicks[1];
         
         // Construct the URL to your Python API (change this to your actual server URL later)
-        const apiUrl = `https://https://route-backend-api.onrender.com/get-route?start_lat=${start.lat}&start_lon=${start.lng}&end_lat=${end.lat}&end_lon=${end.lng}`;
+        const apiUrl = `https://route-backend-api.onrender.com/get-route?start_lat=${start.lat}&start_lon=${start.lng}&end_lat=${end.lat}&end_lon=${end.lng}`;
         
         try {
             const response = await fetch(apiUrl);
