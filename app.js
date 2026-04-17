@@ -4,6 +4,58 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+// 1b. Utrecht Bounding Box
+
+async function drawUtrechtMask() {
+    try {
+        // 1. Haal jouw lokale bestand op (zorg dat dit precies zo heet als je bestand)
+        const response = await fetch('JSONUTRECHT.geojson');
+        const data = await response.json();
+
+        let utrechtCoords = [];
+
+        // 2. Zoek de geometrie in het standaard GeoJSON formaat
+        // Meestal zit dit verborgen in de eerste "Feature" van de "FeatureCollection"
+        const geometry = data.features ? data.features[0].geometry : data.geometry;
+
+        if (!geometry) {
+            console.error("Kon geen geometry vinden in JSONUTRECHT.geojson");
+            return;
+        }
+
+        // 3. GeoJSON gebruikt [Lengtegraad, Breedtegraad], Leaflet wil [Breedtegraad, Lengtegraad].
+        if (geometry.type === 'Polygon') {
+            utrechtCoords = geometry.coordinates[0].map(c => [c[1], c[0]]);
+        } else if (geometry.type === 'MultiPolygon') {
+            // Als de grens uit meerdere stukken bestaat (bijv. eilandjes), pakken we het grootste stuk
+            utrechtCoords = geometry.coordinates[0][0].map(c => [c[1], c[0]]);
+        }
+
+        // 4. Maak een rechthoek die de hele wereld bedekt
+        const outerWorld = [
+            [90, -180],
+            [90, 180],
+            [-90, 180],
+            [-90, -180]
+        ];
+
+        // 5. Teken het masker met het 'gat' in de vorm van jouw bestand
+        L.polygon([outerWorld, utrechtCoords], {
+            color: '#333',       // Randkleur van Utrecht
+            weight: 2,           // Dikte van de rand
+            fillColor: '#000',   // Zwarte invulling
+            fillOpacity: 0.5     // 50% transparant
+        }).addTo(map);
+
+    } catch (error) {
+        console.error("Fout bij het laden van JSONUTRECHT.geojson:", error);
+    }
+}
+
+// Roep de functie aan zodra de pagina laadt
+drawUtrechtMask();
+// -----------------------------------------------------------
+
 // 2. Variabelen om de status op te slaan
 let startCoords = null;
 let endCoords = null;
