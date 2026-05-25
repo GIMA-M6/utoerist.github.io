@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utrecht Tourist Route Planner</title>
+    <title>UTourist Route Planner</title>
+
+    <link rel="icon" type="image/png" href="favicon.utourist.png">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,7 +26,21 @@
             width: 300px;
             z-index: 1000;
         }
+        /* De container die het logo en de titel naast elkaar zet */
+        .header-container {
+            display: flex;
+            align-items: center; /* Zorgt dat ze verticaal perfect in het midden uitlijnen */
+            gap: 12px;           /* De ruimte tussen het logo en de tekst */
+            margin-bottom: 15px; /* Ruimte onder de titel */
+        }
 
+        /* De opmaak van het logo zelf */
+        .panel-logo {
+            width: 45px;         /* Pas dit getal aan om je logo groter/kleiner te maken */
+            height: auto;
+            border-radius: 4px;  /* Optioneel: maakt de hoekjes van je logo iets ronder */
+        }
+        
         #ui-panel h2 { margin-top: 0; font-size: 1.4rem; color: #333; }
         
         .input-group { margin-bottom: 15px; position: relative; }
@@ -71,7 +87,11 @@
 <body>
 
     <div id="ui-panel">
-        <h2>Utrecht Tourist Route Planner</h2>
+       
+        <div class="header-container">
+            <img src="logo.png" alt="App Logo" class="panel-logo">
+            <h2>UTourist Route Planner</h2>
+        </div>
         
         <div class="input-group">
             <label>Origin</label>
