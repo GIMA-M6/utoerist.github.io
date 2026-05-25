@@ -36,9 +36,31 @@
 
         /* De opmaak van het logo zelf */
         .panel-logo {
-            width: 72px;         /* Pas dit getal aan om je logo groter/kleiner te maken */
+            width: 54px;         /* Pas dit getal aan om je logo groter/kleiner te maken */
             height: auto;
             border-radius: 4px;  /* Optioneel: maakt de hoekjes van je logo iets ronder */
+        }
+       
+        /* Zorgt dat de twee teksten netjes onder elkaar staan */
+        .title-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* De hoofd-titel  */
+        #ui-panel h2 { 
+            margin: 0; 
+            font-size: 1.3rem; 
+            color: #333; 
+            line-height: 1.1; 
+        }
+
+        /* De sub-titel  */
+        .subtitle {
+            font-size: 0.85rem;    /* Een paar maten kleiner */
+            font-weight: normal;   /* Niet dikgedrukt */
+            color: #666;           /* Iets lichter grijs voor een mooi contrast */
+            margin-top: 2px;       /* Klein beetje ruimte tussen de twee woorden */
         }
         
         #ui-panel h2 { margin-top: 0; font-size: 1.4rem; color: #333; }
@@ -90,7 +112,11 @@
        
         <div class="header-container">
             <img src="logo.png" alt="App Logo" class="panel-logo">
-            <h2>UTourist Route Planner</h2>
+            
+            <div class="title-wrapper">
+                <h2>UTourist</h2>
+                <div class="subtitle">Route Planner</div>
+            </div>
         </div>
         
         <div class="input-group">
