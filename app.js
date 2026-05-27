@@ -143,7 +143,7 @@ document.addEventListener('click', function(e) {
 });
 
 
-// --- DEEL 2: HANDMATIG ZOEKEN (Via de 🔍 knop of Enter) ---
+// Searching
 async function geocodeLocation(query, isStart) {
     const statusText = document.getElementById('status-text');
     statusText.innerText = "Searching for location...";
@@ -185,7 +185,7 @@ document.getElementById('end-input').addEventListener('keypress', e => {
 });
 
 
-// --- DEEL 3: KLIKKEN OP DE KAART ---
+// Clicking
 map.on('click', function(e) {
     if (!startCoords) {
         startCoords = e.latlng;
@@ -197,9 +197,19 @@ map.on('click', function(e) {
         markers.push(L.marker(e.latlng).addTo(map));
     }
 });
+// Slider
+document.getElementById('scenic-slider').addEventListener('input', function(e) {
+    const val = parseFloat(e.target.value);
+    let text = "Balanced";
+    if (val === 0) text = "Fastest Route";
+    else if (val > 0 && val < 0.5) text = "Slightly Scenic";
+    else if (val > 0.5 && val < 1) text = "Very Scenic";
+    else if (val === 1) text = "Maximum Scenic";
+    
+    document.getElementById('scenic-value-display').innerText = `${text} (${val})`;
+});
 
-
-// --- DEEL 4: DE BACKEND AANROEPEN (Route Berekenen) ---
+// Backend
 document.getElementById('calc-btn').addEventListener('click', async function() {
     if (!startCoords || !endCoords) {
         alert("Please select both an Origin and a Destination first!");
@@ -209,8 +219,19 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
     const statusText = document.getElementById('status-text');
     statusText.innerText = "Calculating route... (waking up server if asleep, max 60s)";
 
-    // Let op: Dit is de live Render API link
-    const apiUrl = `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
+    // Hugging Face API Link
+    const alphaValue = parseFloat(document.getElementById('scenic-slider').value);
+    const baseUrl = `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
+
+    let apiUrl = '';
+    
+    // Alpha 0 is fast
+    if (alphaValue === 0) {
+        apiUrl = `${baseUrl}/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
+    } else {
+        // Else scenic
+        apiUrl = `${baseUrl}/get-scenic-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}&alpha=${alphaValue}`;
+    }
 
     try {
         const response = await fetch(apiUrl);
@@ -221,20 +242,30 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
         if (data.status === "success") {
             if (routeLine) map.removeLayer(routeLine);
             
-            routeLine = L.polyline(data.route, {color: '#e32400', weight: 6, opacity: 0.8}).addTo(map);
+            const lineColor = alphaValue > 0 ? '#153bd4' : '#e32400'; // Blue scenic, Red fast
+            
+            routeLine = L.polyline(data.route, {color: lineColor, weight: 6, opacity: 0.8}).addTo(map);
             map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
             statusText.innerText = "Route found!";
+
+            // Vul de statistieken in en maak het blokje zichtbaar
+            document.getElementById('stat-dist').innerText = data.distance_m;
+            document.getElementById('stat-scenic').innerText = data.mean_scenic_score !== null ? data.mean_scenic_score : 'N/A';
+            document.getElementById('route-stats').style.display = 'block';
+
         } else {
             statusText.innerText = "Could not find a route.";
+            document.getElementById('route-stats').style.display = 'none';
         }
     } catch (error) {
         console.error("API Error:", error);
         statusText.innerText = "Error connecting to server. Please try again.";
+        document.getElementById('route-stats').style.display = 'none';
     }
 });
 
 
-// --- DEEL 5: RESET DE KAART ---
+// Reset
 document.getElementById('reset-btn').addEventListener('click', function() {
     startCoords = null;
     endCoords = null;
@@ -242,7 +273,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
     document.getElementById('start-input').value = "";
     document.getElementById('end-input').value = "";
     document.getElementById('status-text').innerText = "";
-    
+    document.getElementById('route-stats').style.display = 'none';
+
     if (routeLine) map.removeLayer(routeLine);
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
