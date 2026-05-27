@@ -137,10 +137,25 @@
             <div id="end-suggestions" class="suggestions-box"></div>
         </div>
 
+        <div class="input-group" style="margin-top: 20px;">
+            <label>Route Preference: <span id="scenic-value-display" style="font-weight: normal; color: #0078A8;">Balanced (0.5)</span></label>
+            <input type="range" id="scenic-slider" min="0" max="1" step="0.1" value="0.5" style="width: 100%; cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #888;">
+                <span>Fastest</span>
+                <span>Most Scenic</span>
+            </div>
+        </div>
+
+
         <button id="calc-btn" class="btn btn-full">Calculate Route</button>
         <button id="reset-btn" class="btn btn-full">Reset Map</button>
         
         <p id="status-text" style="font-size: 0.8rem; color: #888; text-align: center; margin-bottom: 0;"></p>
+    
+        <div id="route-stats" style="display: none; margin-top: 15px; padding: 10px; background-color: #f0f8ff; border: 1px solid #cce7ff; border-radius: 4px; font-size: 0.85rem; color: #333;">
+            <strong style="display: block; margin-bottom: 5px;">Route Info:</strong>
+            <div>Distance: <span id="stat-dist" style="font-weight: bold;">-</span> meters</div>
+            <div>Scenic Score: <span id="stat-scenic" style="font-weight: bold;">-</span></div>
     </div>
 
     <div id="map"></div>
