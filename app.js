@@ -248,9 +248,20 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
             map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
             statusText.innerText = "Route found!";
 
-            // Vul de statistieken in en maak het blokje zichtbaar
-            document.getElementById('stat-dist').innerText = data.distance_m;
-            document.getElementById('stat-scenic').innerText = data.mean_scenic_score !== null ? data.mean_scenic_score : 'N/A';
+           // Dynamic distance
+            let distanceText = "";
+            if (data.distance_m >= 1000) {
+                // Deel door 1000 en rond af op 1 decimaal (bijv. 1.6 km)
+                distanceText = (data.distance_m / 1000).toFixed(1) + " km";
+            } else {
+                // Onder de 1000, gewoon afronden op hele meters (bijv. 600 m)
+                distanceText = Math.round(data.distance_m) + " m";
+            }
+
+            document.getElementById('stat-dist').innerText = distanceText;
+            
+            document.getElementById('stat-scenic').innerText = data.mean_scenic_score !== null ? data.mean_scenic_score.toFixed(2) : 'N/A';
+            
             document.getElementById('route-stats').style.display = 'block';
 
         } else {
