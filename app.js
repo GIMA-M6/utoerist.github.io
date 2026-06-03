@@ -221,16 +221,15 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
 
     // Hugging Face API Link
     const alphaValue = parseFloat(document.getElementById('scenic-slider').value);
-    const baseUrl = `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
 
     let apiUrl = '';
     
     // Alpha 0 is fast
     if (alphaValue === 0) {
-        apiUrl = `${baseUrl}/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
+        apiUrl = `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`;
     } else {
         // Else scenic
-        apiUrl = `${baseUrl}/get-scenic-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}&alpha=${alphaValue}`;
+        apiUrl = `https://olegbergs-route-backend-api.hf.space/get-scenic-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}&alpha=${alphaValue}`;
     }
 
     try {
