@@ -279,7 +279,7 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
 document.getElementById('reset-btn').addEventListener('click', function() {
     startCoords = null;
     endCoords = null;
-    
+
     document.getElementById('start-input').value = "";
     document.getElementById('end-input').value = "";
     document.getElementById('status-text').innerText = "";
@@ -288,4 +288,11 @@ document.getElementById('reset-btn').addEventListener('click', function() {
     if (routeLine) map.removeLayer(routeLine);
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
+
+    // Scenic explanation resetten
+    document.getElementById('scenic-summary').innerText = "";
+    document.getElementById('scenic-breakdown').innerHTML = "";
+    document.getElementById('scenic-segments').innerHTML = "";
+    document.getElementById('scenic-info').style.display = 'none';
 });
+
