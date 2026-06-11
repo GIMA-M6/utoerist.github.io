@@ -396,7 +396,7 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
             // 3. Teken EERST het alternatief (deze komt dan netjes 'onder' de hoofdroute te liggen)
             // Stijl: Grijs, transparant (0.5), en gestreept (dashArray)
             altRouteLine = L.polyline(altData.route, {
-                color: '#888', weight: 5, opacity: 0.6, dashArray: '8, 8'
+                color: '#444', weight: 5, opacity: 0.8, dashArray: '8, 8'
             }).addTo(map);
 
             // 4. Teken DAARNA de hoofdroute (Bovenop, volle kleur)
