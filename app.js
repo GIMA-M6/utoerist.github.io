@@ -124,7 +124,7 @@ async function fetchSuggestions(query, boxId, isStart) {
                 // Wat er gebeurt als je op een suggestie klikt
                 div.onclick = () => {
                     const inputId = isStart ? 'start-input' : 'end-input';
-                    document.getElementById(inputId).value = item.display_name.split(',')[0];
+                    document.getElementById(inputId).value = shortName; 
                     box.style.display = 'none'; 
                     geocodeExactLocation(item, isStart);
                 };
@@ -188,7 +188,10 @@ async function geocodeLocation(query, isStart) {
 
         if (data.length > 0) {
             geocodeExactLocation(data[0], isStart);
-            const placeName = data[0].display_name.split(',')[0];
+            
+            // Pak de eerste TWEE stukjes (slice 0, 2) en plak ze aan elkaar
+            const placeName = data[0].display_name.split(',').slice(0, 2).join(', ');
+            
             if (isStart) document.getElementById('start-input').value = placeName;
             else document.getElementById('end-input').value = placeName;
             
@@ -226,7 +229,7 @@ document.getElementById('loc-btn').addEventListener('click', function() {
 
     // 2. Geef de gebruiker visuele feedback dat we aan het zoeken zijn
     const startInput = document.getElementById('start-input');
-    startInput.value = "Locatie zoeken...";
+    startInput.value = "Searching location...";
 
     // 3. Vraag de locatie op
     navigator.geolocation.getCurrentPosition(
