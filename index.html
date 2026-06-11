@@ -111,7 +111,7 @@
         .search-btn { width: 40px; margin: 0; padding: 8px; background-color: #0078A8; color: white; }
         .search-btn:hover { background-color: #005f85; }
     
-    /* 📱 MOBILE OPTIMIZATION: "Bottom Sheet" UI */
+    /* MOBILE OPTIMIZATION: "Bottom Sheet" UI */
         @media (max-width: 600px) {
             #ui-panel {
                 top: auto;                 /* Remove top spacing */
@@ -121,7 +121,7 @@
                 box-sizing: border-box;
                 border-radius: 20px 20px 0 0; /* Only round the top corners */
                 padding: 15px;
-                max-height: 45vh;          /* Take up max 45% of screen height */
+                max-height: 50vh;          /* Take up max 50% of screen height */
                 overflow-y: auto;          /* Allow scrolling inside the menu */
                 box-shadow: 0 -4px 12px rgba(0,0,0,0.2); /* Shadow points UP */
                 transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
@@ -199,19 +199,27 @@
             <strong style="display: block; margin-bottom: 8px;">Route Comparison:</strong>
             
             <div style="display: flex; justify-content: space-between; gap: 10px;">
+                
                 <div style="flex: 1; border-right: 1px solid #ccc; padding-right: 5px;">
-                    <strong id="main-route-title" style="color: #153bd4;">Selected Route</strong>
-                    <div style="margin-top: 4px;">Time <span id="stat-time" style="font-weight: bold;">-</span></div>
-                    <div>Distance <span id="stat-dist" style="font-weight: bold;">-</span></div>
-                    <div>Scenic <span id="stat-scenic" style="font-weight: bold;">-</span></div>
+                    <strong id="main-route-title" style="color: #153bd4; display: block; margin-bottom: 4px;">Selected Route</strong>
+                    
+                    <div style="display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 2px;">
+                        <span style="color: #555;">Time:</span> <span id="stat-time" style="font-weight: bold;">-</span>
+                        <span style="color: #555;">Distance:</span> <span id="stat-dist" style="font-weight: bold;">-</span>
+                        <span style="color: #555;">Scenic:</span> <span id="stat-scenic" style="font-weight: bold;">-</span>
+                    </div>
                 </div>
                 
                 <div style="flex: 1; padding-left: 5px;">
-                    <strong id="alt-route-title" style="color: #888;">Alternative</strong>
-                    <div style="margin-top: 4px; color: #666;">Time <span id="alt-stat-time">-</span></div>
-                    <div style="color: #666;">Distance <span id="alt-stat-dist">-</span></div>
-                    <div style="color: #666;">Scenic <span id="alt-stat-scenic">-</span></div>
+                    <strong id="alt-route-title" style="color: #888; display: block; margin-bottom: 4px;">Alternative</strong>
+                    
+                    <div style="display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 2px; color: #666;">
+                        <span>Time:</span> <span id="alt-stat-time" style="font-weight: bold;">-</span>
+                        <span>Distance:</span> <span id="alt-stat-dist" style="font-weight: bold;">-</span>
+                        <span>Scenic:</span> <span id="alt-stat-scenic" style="font-weight: bold;">-</span>
+                    </div>
                 </div>
+
             </div>
         </div>
         <div id="scenic-info" style="display:none; margin-top:15px; padding:10px; background-color:#fff7e6; border:1px solid #ffd591; border-radius:4px; font-size:0.85rem; color:#333;">
