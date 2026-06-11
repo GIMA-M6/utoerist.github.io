@@ -1,10 +1,8 @@
 // 1. Initialiseer de kaart gecentreerd op Utrecht
 const map = L.map('map').setView([52.0907, 5.1214], 14);
-L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.{ext}', {
-    minZoom: 0,
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    ext: 'png'
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
 }).addTo(map);
 // 1b. Utrecht Bounding Box
 
@@ -307,10 +305,10 @@ document.getElementById('toggle-menu-btn').addEventListener('click', function() 
     if (uiPanel.classList.contains('panel-hidden')) {
         // Menu is currently hidden -> SHOW IT
         uiPanel.classList.remove('panel-hidden');
-        btn.innerHTML = '👁️ Hide Menu';
+        btn.innerHTML = 'Hide Menu';
     } else {
         // Menu is currently visible -> HIDE IT
         uiPanel.classList.add('panel-hidden');
-        btn.innerHTML = '🗺️ Show Menu';
+        btn.innerHTML = 'Show Menu';
     }
 });
