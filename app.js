@@ -46,7 +46,7 @@ async function drawUtrechtMask() {
             color: '#333',       // Randkleur van Utrecht
             weight: 2,           // Dikte van de rand
             fillColor: '#000',   // Zwarte invulling
-            fillOpacity: 0.4     // 40% transparant
+            fillOpacity: 0.4,     // 40% transparant
             interactive: false
         }).addTo(map);
 
