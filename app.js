@@ -216,6 +216,53 @@ document.getElementById('end-input').addEventListener('keypress', e => {
     if (e.key === 'Enter') document.getElementById('search-end').click();
 });
 
+// --- GEOLOCATIE (Mijn huidige locatie) ---
+document.getElementById('loc-btn').addEventListener('click', function() {
+    // 1. Check of browser deze functie ondersteunt
+    if (!navigator.geolocation) {
+        alert("Geolocation wordt niet ondersteund door jouw browser.");
+        return;
+    }
+
+    // 2. Geef de gebruiker visuele feedback dat we aan het zoeken zijn
+    const startInput = document.getElementById('start-input');
+    startInput.value = "Locatie zoeken...";
+
+    // 3. Vraag de locatie op
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
+            // Succes! We hebben de coördinaten
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // Wis een eventuele eerdere route/kaart als beide al waren ingevuld
+            if (startCoords && endCoords) {
+                document.getElementById('reset-btn').click(); 
+            }
+
+            // Sla op in jouw globale variabelen
+            startCoords = { lat: lat, lng: lng };
+
+            // Plaats de marker en vlieg er naartoe op de kaart
+            const marker = L.marker([lat, lng], { title: "Current Location" }).addTo(map);
+            markers.push(marker);
+            map.setView([lat, lng], 16); // 16 is lekker dichtbij ingezoomd
+
+            // Gebruik jouw Reverse Geocoding functie om er een mooi adres van te maken!
+            const address = await getAddressFromCoords(lat, lng);
+            startInput.value = address;
+        },
+        function(error) {
+            // Foutafhandeling (bijv. als de gebruiker op "Blokkeren" klikt)
+            console.error("Error getting location:", error);
+            startInput.value = "";
+            alert("Kon locatie niet ophalen. Zorg dat je locatie-toegang toestaat in je browser.");
+        },
+        {
+            enableHighAccuracy: true // Vraagt om GPS-precisie (vooral op telefoons)
+        }
+    );
+});
 
 // --- MAP CLICK EVENT ---
 map.on('click', async function(e) {
