@@ -1,5 +1,7 @@
-// 1. Initialiseer de kaart gecentreerd op Utrecht
-const map = L.map('map').setView([52.0907, 5.1214], 14);
+// 1. Initialiseer de kaart ZONDER de standaard zoomknoppen
+const map = L.map('map', { zoomControl: false }).setView([52.0907, 5.1214], 13);
+// 2. handmatige zoomknoppen
+L.control.zoom({ position: 'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
@@ -256,8 +258,25 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
                 // Onder de 1000, gewoon afronden op hele meters (bijv. 600 m)
                 distanceText = Math.round(data.distance_m) + " m";
             }
-
             document.getElementById('stat-dist').innerText = distanceText;
+            
+            let timeText = "";
+            let mins = data.time_minutes;
+            
+            if (mins >= 60) {
+                // Bereken hoeveel hele uren (bijv. 154 / 60 = 2)
+                let hours = Math.floor(mins / 60);
+                // Bereken hoeveel minuten overblijven (bijv. 154 % 60 = 34)
+                let remainingMins = mins % 60;
+                
+                // Plakken (als 0 minuten overblijven, weglaten)
+                timeText = hours + " h" + (remainingMins > 0 ? " " + remainingMins + " min" : "");
+            } else {
+                // Minder dan een uur, alleen minuten
+                timeText = mins + " min";
+            }
+
+            document.getElementById('stat-time').innerText = timeText;
             
             document.getElementById('stat-scenic').innerText = data.mean_scenic_score !== null ? data.mean_scenic_score.toFixed(2) : 'N/A';
             
