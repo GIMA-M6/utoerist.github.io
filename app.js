@@ -65,6 +65,35 @@ let routeLine = null;
 let markers = [];
 let timeoutId; // Voor de typ-vertraging (debouncing)
 
+// --- REVERSE GEOCODING ---
+// Vertaalt een klik op de kaart naar een leesbaar adres via OpenStreetMap Nominatim
+async function getAddressFromCoords(lat, lng) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+        const data = await response.json();
+        
+        if (data && data.address) {
+            // Probeer straat + huisnummer + stad op te bouwen
+            let street = data.address.road || data.address.pedestrian || data.address.footway || data.address.cycleway || "";
+            let number = data.address.house_number || "";
+            let city = data.address.city || data.address.town || data.address.village || "Utrecht"; // Fallback stad
+            
+            // Als we een straatnaam hebben gevonden, maak er iets moois van
+            if (street) {
+                let formattedAddress = `${street} ${number}, ${city}`;
+                // Verwijder dubbele spaties voor het geval er geen huisnummer is
+                return formattedAddress.replace(" ,", ",").trim(); 
+            }
+            // Als het bijvoorbeeld in het midden van een bos is zonder straat, pak de algemene naam
+            return data.display_name.split(",")[0] + ", " + city;
+        }
+    } catch (error) {
+        console.error("Geocoding failed:", error);
+    }
+    // Fallback: Als het internet wegvalt of API faalt, laat alsnog de coördinaten zien
+    return `Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`; 
+}
+
 // --- DEEL 1: AUTOCOMPLETE & ZOEKEN TERWIJL JE TYPT ---
 async function fetchSuggestions(query, boxId, isStart) {
     const box = document.getElementById(boxId);
@@ -187,16 +216,42 @@ document.getElementById('end-input').addEventListener('keypress', e => {
 });
 
 
-// Clicking
-map.on('click', function(e) {
-    if (!startCoords) {
-        startCoords = e.latlng;
-        document.getElementById('start-input').value = `Lat: ${e.latlng.lat.toFixed(4)}, Lon: ${e.latlng.lng.toFixed(4)}`;
-        markers.push(L.marker(e.latlng).addTo(map));
-    } else if (!endCoords) {
-        endCoords = e.latlng;
-        document.getElementById('end-input').value = `Lat: ${e.latlng.lat.toFixed(4)}, Lon: ${e.latlng.lng.toFixed(4)}`;
-        markers.push(L.marker(e.latlng).addTo(map));
+// --- MAP CLICK EVENT ---
+map.on('click', async function(e) {
+    const lat = e.latlng.lat;
+    const lng = e.latlng.lng;
+    
+    // Bepaal of we de start of het einde aan het invullen zijn
+    if (!startPoint || (startPoint && endPoint)) {
+        // We vullen de start in (of we beginnen helemaal opnieuw)
+        if (startPoint && endPoint) {
+            // Reset de kaart als er al een route was
+            resetMap(); 
+        }
+        
+        startPoint = e.latlng;
+        if (startMarker) map.removeLayer(startMarker);
+        startMarker = L.marker(startPoint, { title: "Origin" }).addTo(map);
+        
+        // Zet er tijdelijk "Adres ophalen..." neer zodat de gebruiker weet dat ie laadt
+        document.getElementById('start-input').value = "Adres ophalen...";
+        
+        // Vraag het adres op en vul het in
+        const address = await getAddressFromCoords(lat, lng);
+        document.getElementById('start-input').value = address;
+        
+    } else if (!endPoint) {
+        // We vullen de bestemming in
+        endPoint = e.latlng;
+        if (endMarker) map.removeLayer(endMarker);
+        endMarker = L.marker(endPoint, { title: "Destination" }).addTo(map);
+        
+        // Tijdelijke laad-tekst
+        document.getElementById('end-input').value = "Adres ophalen...";
+        
+        // Vraag het adres op en vul het in
+        const address = await getAddressFromCoords(lat, lng);
+        document.getElementById('end-input').value = address;
     }
 });
 // Slider
