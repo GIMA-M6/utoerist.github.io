@@ -298,3 +298,19 @@ document.getElementById('reset-btn').addEventListener('click', function() {
     document.getElementById('scenic-info').style.display = 'none';
 });
 
+// --- MENU TOGGLE LOGIC ---
+document.getElementById('toggle-menu-btn').addEventListener('click', function() {
+    const uiPanel = document.getElementById('ui-panel');
+    const btn = document.getElementById('toggle-menu-btn');
+    
+    // Check if the panel currently has the hidden class
+    if (uiPanel.classList.contains('panel-hidden')) {
+        // Menu is currently hidden -> SHOW IT
+        uiPanel.classList.remove('panel-hidden');
+        btn.innerHTML = '👁️ Hide Menu';
+    } else {
+        // Menu is currently visible -> HIDE IT
+        uiPanel.classList.add('panel-hidden');
+        btn.innerHTML = '🗺️ Show Menu';
+    }
+});

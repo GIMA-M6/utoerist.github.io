@@ -25,6 +25,12 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             width: 300px;
             z-index: 1000;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        }
+        .panel-hidden {
+            transform: translateX(-120%);
+            opacity: 0;
+            pointer-events: none; /* Ensures invisible buttons can't be clicked */
         }
         /* De container die het logo en de titel naast elkaar zet */
         .header-container {
@@ -168,7 +174,11 @@
             <strong>Top scenic segments:</strong>
             <div id="scenic-segments"></div>
         </div>
+        <button id="toggle-menu-btn" style="position: absolute; top: 20px; right: 20px; z-index: 9999; padding: 10px 15px; background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: background 0.2s;">
+        Hide Menu
+        </button>
 
+    <div id="map"></div>
 
     </div> <div id="map"></div>
 
