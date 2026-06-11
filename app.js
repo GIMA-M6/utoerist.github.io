@@ -62,9 +62,27 @@ drawUtrechtMask();
 // 2. Variabelen om de status op te slaan
 let startCoords = null;
 let endCoords = null;
-let routeLine = null;
+let mainRouteLine = null;
+let altRouteLine = null;
 let markers = [];
 let timeoutId; // Voor de typ-vertraging (debouncing)
+
+// Hulpfunctie: Maak een mooie afstand (m of km)
+function formatDistance(meters) {
+    if (meters >= 1000) return (meters / 1000).toFixed(1) + " km";
+    return Math.round(meters) + " m";
+}
+
+// Hulpfunctie: Maak een mooie tijd (min of uren)
+function formatTime(mins) {
+    if (mins < 1) return "1 min";
+    if (mins >= 60) {
+        let h = Math.floor(mins / 60);
+        let m = mins % 60;
+        return h + " h" + (m > 0 ? " " + m + " min" : "");
+    }
+    return mins + " min";
+}
 
 // --- REVERSE GEOCODING ---
 // Vertaalt een klik op de kaart naar een leesbaar adres via OpenStreetMap Nominatim
@@ -348,55 +366,66 @@ document.getElementById('calc-btn').addEventListener('click', async function() {
     }
 
     try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Server error or sleep timeout");
+        // 1. Bepaal wat de gebruiker koos (Main) en wat het alternatief is (Alt)
+        let altAlphaValue = alphaValue === 0 ? 1.0 : 0; // Als ze Snelst kiezen, is alt 100% Scenic, en vice versa.
         
-        const data = await response.json();
+        let mainUrl = alphaValue === 0 
+            ? `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`
+            : `https://olegbergs-route-backend-api.hf.space/get-scenic-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}&alpha=${alphaValue}`;
+            
+        let altUrl = altAlphaValue === 0 
+            ? `https://olegbergs-route-backend-api.hf.space/get-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}`
+            : `https://olegbergs-route-backend-api.hf.space/get-scenic-route?start_lat=${startCoords.lat}&start_lon=${startCoords.lng}&end_lat=${endCoords.lat}&end_lon=${endCoords.lng}&alpha=${altAlphaValue}`;
+
+        // 2. Promise.all! Vraag beide routes tegelijkertijd op bij de server (scheelt de helft van de wachttijd)
+        const [mainResponse, altResponse] = await Promise.all([
+            fetch(mainUrl),
+            fetch(altUrl)
+        ]);
+
+        if (!mainResponse.ok || !altResponse.ok) throw new Error("Server error or sleep timeout");
         
-        if (data.status === "success") {
-            if (routeLine) map.removeLayer(routeLine);
+        const mainData = await mainResponse.json();
+        const altData = await altResponse.json();
+        
+        if (mainData.status === "success" && altData.status === "success") {
+            // Verwijder oude lijnen op de kaart
+            if (mainRouteLine) map.removeLayer(mainRouteLine);
+            if (altRouteLine) map.removeLayer(altRouteLine);
             
-            const lineColor = alphaValue > 0 ? '#153bd4' : '#e32400'; // Blue scenic, Red fast
-            
-            routeLine = L.polyline(data.route, {color: lineColor, weight: 6, opacity: 0.8}).addTo(map);
-            map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-            statusText.innerText = "Route found!";
+            // 3. Teken EERST het alternatief (deze komt dan netjes 'onder' de hoofdroute te liggen)
+            // Stijl: Grijs, transparant (0.5), en gestreept (dashArray)
+            altRouteLine = L.polyline(altData.route, {
+                color: '#888', weight: 5, opacity: 0.6, dashArray: '8, 8'
+            }).addTo(map);
 
-           // Dynamic distance
-            let distanceText = "";
-            if (data.distance_m >= 1000) {
-                // Deel door 1000 en rond af op 1 decimaal (bijv. 1.6 km)
-                distanceText = (data.distance_m / 1000).toFixed(1) + " km";
-            } else {
-                // Onder de 1000, gewoon afronden op hele meters (bijv. 600 m)
-                distanceText = Math.round(data.distance_m) + " m";
-            }
-            document.getElementById('stat-dist').innerText = distanceText;
+            // 4. Teken DAARNA de hoofdroute (Bovenop, volle kleur)
+            const mainColor = alphaValue > 0 ? '#153bd4' : '#e32400'; 
+            mainRouteLine = L.polyline(mainData.route, {
+                color: mainColor, weight: 6, opacity: 0.9
+            }).addTo(map);
             
-            let timeText = "";
-            let mins = data.time_minutes;
-            
-            if (mins >= 60) {
-                // Bereken hoeveel hele uren (bijv. 154 / 60 = 2)
-                let hours = Math.floor(mins / 60);
-                // Bereken hoeveel minuten overblijven (bijv. 154 % 60 = 34)
-                let remainingMins = mins % 60;
-                
-                // Plakken (als 0 minuten overblijven, weglaten)
-                timeText = hours + " h" + (remainingMins > 0 ? " " + remainingMins + " min" : "");
-            } else {
-                // Minder dan een uur, alleen minuten
-                timeText = mins + " min";
-            }
+            // Zoom netjes in
+            map.fitBounds(mainRouteLine.getBounds(), { padding: [50, 50] });
+            statusText.innerText = "Routes found!";
 
-            document.getElementById('stat-time').innerText = timeText;
-            
-            document.getElementById('stat-scenic').innerText = data.mean_scenic_score !== null ? data.mean_scenic_score.toFixed(2) : 'N/A';
+            // 5. Vul de HTML Stats in (Main Route)
+            document.getElementById('main-route-title').innerText = alphaValue === 0 ? "Fastest Route" : "Scenic Route";
+            document.getElementById('main-route-title').style.color = mainColor;
+            document.getElementById('stat-dist').innerText = formatDistance(mainData.distance_m);
+            document.getElementById('stat-time').innerText = formatTime(mainData.time_minutes);
+            document.getElementById('stat-scenic').innerText = mainData.mean_scenic_score !== null ? mainData.mean_scenic_score.toFixed(1) : 'N/A';
+
+            // 6. Vul de HTML Stats in (Alt Route)
+            document.getElementById('alt-route-title').innerText = altAlphaValue === 0 ? "Fastest Alt." : "Scenic Alt.";
+            document.getElementById('alt-stat-dist').innerText = formatDistance(altData.distance_m);
+            document.getElementById('alt-stat-time').innerText = formatTime(altData.time_minutes);
+            document.getElementById('alt-stat-scenic').innerText = altData.mean_scenic_score !== null ? altData.mean_scenic_score.toFixed(1) : 'N/A';
             
             document.getElementById('route-stats').style.display = 'block';
 
         } else {
-            statusText.innerText = "Could not find a route.";
+            statusText.innerText = "Could not find one or both routes.";
             document.getElementById('route-stats').style.display = 'none';
         }
     } catch (error) {
@@ -417,7 +446,8 @@ document.getElementById('reset-btn').addEventListener('click', function() {
     document.getElementById('status-text').innerText = "";
     document.getElementById('route-stats').style.display = 'none';
 
-    if (routeLine) map.removeLayer(routeLine);
+    if (mainRouteLine) map.removeLayer(mainRouteLine);
+    if (altRouteLine) map.removeLayer(altRouteLine);
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
 
