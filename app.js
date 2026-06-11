@@ -222,16 +222,20 @@ map.on('click', async function(e) {
     const lng = e.latlng.lng;
     
     // Bepaal of we de start of het einde aan het invullen zijn
-    if (!startPoint || (startPoint && endPoint)) {
-        // We vullen de start in (of we beginnen helemaal opnieuw)
-        if (startPoint && endPoint) {
-            // Reset de kaart als er al een route was
-            resetMap(); 
+    // We kijken nu naar jouw eigen 'startCoords' en 'endCoords'
+    if (!startCoords || (startCoords && endCoords)) {
+        
+        // Als beide al ingevuld waren en je klikt nog een keer: wis de kaart
+        if (startCoords && endCoords) {
+            document.getElementById('reset-btn').click(); 
         }
         
-        startPoint = e.latlng;
-        if (startMarker) map.removeLayer(startMarker);
-        startMarker = L.marker(startPoint, { title: "Origin" }).addTo(map);
+        // Sla de coördinaten op in jouw formaat
+        startCoords = { lat: lat, lng: lng };
+        
+        // Plaats de marker en voeg toe aan jouw 'markers' array
+        const marker = L.marker([lat, lng], { title: "Origin" }).addTo(map);
+        markers.push(marker);
         
         // Zet er tijdelijk "Adres ophalen..." neer zodat de gebruiker weet dat ie laadt
         document.getElementById('start-input').value = "Adres ophalen...";
@@ -240,11 +244,13 @@ map.on('click', async function(e) {
         const address = await getAddressFromCoords(lat, lng);
         document.getElementById('start-input').value = address;
         
-    } else if (!endPoint) {
+    } else if (!endCoords) {
+        
         // We vullen de bestemming in
-        endPoint = e.latlng;
-        if (endMarker) map.removeLayer(endMarker);
-        endMarker = L.marker(endPoint, { title: "Destination" }).addTo(map);
+        endCoords = { lat: lat, lng: lng };
+        
+        const marker = L.marker([lat, lng], { title: "Destination" }).addTo(map);
+        markers.push(marker);
         
         // Tijdelijke laad-tekst
         document.getElementById('end-input').value = "Adres ophalen...";
@@ -254,6 +260,7 @@ map.on('click', async function(e) {
         document.getElementById('end-input').value = address;
     }
 });
+
 // Slider
 document.getElementById('scenic-slider').addEventListener('input', function(e) {
     const val = parseFloat(e.target.value);
