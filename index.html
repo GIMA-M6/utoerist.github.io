@@ -14,7 +14,6 @@
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #map { height: 100vh; width: 100vw; z-index: 1; }
         
-        /* Het zwevende UI Paneel */
         #ui-panel {
             position: absolute;
             top: 20px;
@@ -30,30 +29,27 @@
         .panel-hidden {
             transform: translateX(-120%);
             opacity: 0;
-            pointer-events: none; /* Ensures invisible buttons can't be clicked */
-        }
-        /* De container die het logo en de titel naast elkaar zet */
-        .header-container {
-            display: flex;
-            align-items: center; /* Zorgt dat ze verticaal perfect in het midden uitlijnen */
-            gap: 12px;           /* De ruimte tussen het logo en de tekst */
-            margin-bottom: 15px; /* Ruimte onder de titel */
+            pointer-events: none;
         }
 
-        /* De opmaak van het logo zelf */
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;  
+            margin-bottom: 15px; 
+        }
+
         .panel-logo {
-            width: 54px;         /* Pas dit getal aan om je logo groter/kleiner te maken */
+            width: 54px; 
             height: auto;
-            border-radius: 4px;  /* Optioneel: maakt de hoekjes van je logo iets ronder */
+            border-radius: 4px;
         }
        
-        /* Zorgt dat de twee teksten netjes onder elkaar staan */
         .title-wrapper {
             display: flex;
             flex-direction: column;
         }
 
-        /* De hoofd-titel  */
         #ui-panel h2 { 
             margin: 0; 
             font-size: 1.3rem; 
@@ -61,12 +57,11 @@
             line-height: 1.1; 
         }
 
-        /* De sub-titel  */
         .subtitle {
-            font-size: 0.85rem;    /* Een paar maten kleiner */
-            font-weight: normal;   /* Niet dikgedrukt */
-            color: #666;           /* Iets lichter grijs voor een mooi contrast */
-            margin-top: 2px;       /* Klein beetje ruimte tussen de twee woorden */
+            font-size: 0.85rem;
+            font-weight: normal;
+            color: #666;
+            margin-top: 2px;
         }
         
         #ui-panel h2 { margin-top: 0; font-size: 1.4rem; color: #333; }
@@ -75,10 +70,10 @@
         .input-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #555; }
         .input-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;}
         
-        /* Autocomplete Suggesties Dropdown */
+        /* Autocomplete Suggestion Dropdown */
         .suggestions-box {
             position: absolute;
-            width: calc(100% - 45px); /* Houdt rekening met de breedte van de zoekknop */
+            width: calc(100% - 45px);
             background: white;
             border: 1px solid #ccc;
             border-top: none;
@@ -87,7 +82,7 @@
             max-height: 150px;
             overflow-y: auto;
             z-index: 1001;
-            display: none; /* Standaard verborgen */
+            display: none;
         }
         .suggestion-item {
             padding: 8px 10px;
@@ -98,7 +93,7 @@
         .suggestion-item:last-child { border-bottom: none; }
         .suggestion-item:hover { background-color: #f0f8ff; }
 
-        /* Knoppen opmaak */
+        /* Buttons */
         .btn { padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-full { width: 100%; margin-bottom: 10px; }
         
@@ -111,36 +106,33 @@
         .search-btn { width: 40px; margin: 0; padding: 8px; background-color: #0078A8; color: white; }
         .search-btn:hover { background-color: #005f85; }
     
-    /* MOBILE OPTIMIZATION: "Bottom Sheet" UI */
+    /* Mobile Device Optimisation */
         @media (max-width: 600px) {
             #ui-panel {
-                top: auto;                 /* Remove top spacing */
-                bottom: 0;                 /* Pin to the bottom */
+                top: auto;
+                bottom: 0;
                 left: 0;
-                width: 100vw;              /* Full width of the phone */
+                width: 100vw; 
                 box-sizing: border-box;
-                border-radius: 20px 20px 0 0; /* Only round the top corners */
+                border-radius: 20px 20px 0 0;
                 padding: 15px;
-                max-height: 50vh;          /* Take up max 50% of screen height */
-                overflow-y: auto;          /* Allow scrolling inside the menu */
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.2); /* Shadow points UP */
+                max-height: 50vh;  
+                overflow-y: auto;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
                 transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
             }
 
-            /* On mobile, slide the panel DOWN to hide it, instead of LEFT */
             .panel-hidden {
                 transform: translateY(120%) !important; 
             }
 
-            /* Move the toggle button so it doesn't overlap with the top zoom controls */
             #toggle-menu-btn {
                 top: auto !important;
                 bottom: 20px !important;
                 right: 20px !important;
-                z-index: 1001 !important; /* Keep it above the hidden panel */
+                z-index: 1001 !important;
             }
             
-            /* Make inputs slightly larger so they are easier to tap with thumbs */
             .input-group input, .btn {
                 padding: 12px;
                 font-size: 1rem;
