@@ -15,8 +15,8 @@ June 2026
 **network (Back end & Network)**
 ```
 .
-├── .github                               #Linking structure to sync Github repository with HuggingFace Server repository
-├── hf_deploy                             #Contains all files relevant for route planner uploaded to HuggingFace Server
+├── .github                               # Linking structure to sync Github repository with HuggingFace Server repository
+├── hf_deploy                             # Contains all files relevant for route planner uploaded to HuggingFace Server
     ├── .gitattributes                    # Contains file to enable Github Actions feature to sync Github repository with HuggingFace Server repository
     ├── api.py                            # Main Python code responsible for running OSMnx libraries and calculating shortest and scenic routes
     ├── Dockerfile                        # File responsible for feeding server instructions on creating dedicated Python container to run code.
@@ -39,11 +39,11 @@ June 2026
 **utourist.github.io (Front end)**
 ```
 .
-├── app.js                      #Javascript file running the core functionalities of the GitHub Pages webpage and communicating with the backend server.
-├── favicon.utourist.png        #Small logo used for the webpage.
-├── index.html                  #HTML file used to design the UI and visual look of the webppage.
-├── JSONUTRECHT.geojson         #File containing BRT Woonplaats boundary of Utrecht for web visualisation
-└── logo.png                    #Logo used for the webpage.
+├── app.js                      # Javascript file running the core functionalities of the GitHub Pages webpage and communicating with the backend server.
+├── favicon.utourist.png        # Small logo used for the webpage.
+├── index.html                  # HTML file used to design the UI and visual look of the webppage.
+├── JSONUTRECHT.geojson         # File containing BRT Woonplaats boundary of Utrecht for web visualisation
+└── logo.png                    # Logo used for the webpage.
 
 ```
 
