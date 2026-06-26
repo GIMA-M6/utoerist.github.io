@@ -15,45 +15,34 @@ June 2026
 **network (Backend & Network)**
 ```
 .
-├── .github/workflows     #Linking structure to sync Github repository with HuggingFace Server repository
-├── hf_deploy             #Contains all files relevant for route planner uploaded to HuggingFace Server
-├── network_base          #Contains all basic OSM network files and scripts
-    └── extra               #Contains leftovers of network files
-└── scenic                #Contains all files and scripts relevant to scenic network
-    └── extra               #Contains leftovers of scenic code
-
+├── .github/workflows             #Linking structure to sync Github repository with HuggingFace Server repository
+├── hf_deploy                     #Contains all files relevant for route planner uploaded to HuggingFace Server
+    ├── .gitattributes            # Contains file to enable Github Actions feature to sync Github repository with HuggingFace Server repository
+    ├── Dockerfile                # File responsible for feeding server instructions on creating dedicated Python container to run code.
+    ├── api.py                    # Main Python code responsible for running OSMnx libraries and calculating shortest and scenic routes 
+    ├── requirements.py           # Contains required libraries to run the code. Used as instructions for the server.
+    ├── utrecht_network.graphml   # Final OSM network file before applying scenic modifications.
+    └── utrecht_network_scenic.graphml   # Final network file after applying scenic modifications, used for scenic routing.
+├── network_base                  # Contains all files and scripts for extracting the basic OSM network
+    ├── network.py                # Python script used to extract and refine network from OSM and export is as GRAPHML and GeoPackage.
+    └── utrecht_network.graphml   # Final OSM network file before applying scenic modifications.
+└── scenic                        # Contains all files and scripts relevant to creating the scenic network
+    ├── config.py                 # All URLs, study area settings, and output paths
+    ├── data_loader.py            # Loads all raw datasets (OSM, BGT, BAG, Atlas, RIVM, UtrechtOpen)
+    ├── main.py                   # Core code linking all scenic code together.
+    ├── scenic_graph.py           # Code used for assigning scenic weights to the network.
+    └── scenic_weights.py         # Contains determined scenic weights per feature used for assigning. 
 ```
 
 **utourist.github.io (Frontend)**
 ```
 .
-├── JSONUTRECHT.geojson     #File containing BRT Woonplaats boundary of Utrecht for web visualisation
-├── app.js                  #Javascript file running the core functionalities of the GitHub Pages webpage and communicating with the backend server.
-├── favicon.utourist.png    #Small logo used for the webpage.
-├── index.html              #HTML file used to design the UI and visual look of the webppage.
-└── logo.png                #Logo used for the webpage.
+├── JSONUTRECHT.geojson         #File containing BRT Woonplaats boundary of Utrecht for web visualisation
+├── app.js                      #Javascript file running the core functionalities of the GitHub Pages webpage and communicating with the backend server.
+├── favicon.utourist.png        #Small logo used for the webpage.
+├── index.html                  #HTML file used to design the UI and visual look of the webppage.
+└── logo.png                    #Logo used for the webpage.
 
-```
-
----
-
-
-
-Load, weight, and export scenic geographic datasets for Utrecht (Netherlands).  
-Weights are derived from empirical scenicness coefficients (see [Data & Methods](#data--methods)).
-
-
-
-```
-.
-├── data_loader.py        # Loads all raw datasets (OSM, BGT, BAG, Atlas, RIVM, UtrechtOpen)
-├── scenic_weights.py     # Assigns normalised scenicness weights to each layer
-├── config.py             # All URLs, study area settings, and output paths
-├── main.py               # Entry point — runs the full pipeline
-├── requirements.txt      # Python dependencies
-└── output/               # Created automatically on first run
-    ├── utrecht_scenic_weighted.gpkg
-    └── scenic_weight_lookup.csv
 ```
 
 ---
