@@ -1,6 +1,6 @@
 # The Scenic Side of Utrecht
 
-Developing a scenic route planner for tourists in the city of Utrecht
+**Developing a scenic route planner for tourists in the city of Utrecht**
 
 Technical University Delft, University of Twente, Utrecht University and Wageningen University & Research: Geographical Information Management and Applications
 Module 6: Advanced Geo-information Applications
@@ -12,7 +12,7 @@ June 2026
 
 #### PROJECT STRUCTURE  #####
 
-**network (Backend & Network) **
+**network (Backend & Network)**
 ```
 .
 ├── .github/workflows     #Linking structure to sync Github repository with HuggingFace Server repository
@@ -24,7 +24,7 @@ June 2026
 
 ```
 
-** utourist.github.io (Frontend) **
+**utourist.github.io (Frontend)**
 ```
 .
 ├── JSONUTRECHT.geojson     #File containing BRT Woonplaats boundary of Utrecht for web visualisation
