@@ -3,9 +3,13 @@
 **Developing a scenic route planner for tourists in the city of Utrecht**
 
 Technical University Delft, University of Twente, Utrecht University and Wageningen University & Research: Geographical Information Management and Applications
+
 Module 6: Advanced Geo-information Applications
+
 Students: Koen Bauer, Oleg Bergsma, Jurian Kraaijeveld & Wouter van Voorst
+
 Supervised by: Corné Vreugdenhil (WUR)
+
 June 2026
 
 ---
